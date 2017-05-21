@@ -299,7 +299,11 @@ class Jetpack_Client {
 		$_path = preg_replace( '/^\//', '', $path );
 
 		// Use GET by default whereas `remote_request` uses POST
-		$request_method = ( isset( $filtered_args['method'] ) ) ? $filtered_args['method'] : 'GET';
+		if ( isset( $filtered_args['method'] ) && strtoupper( $filtered_args['method'] === 'POST' ) ) {
+			$request_method = 'POST';
+		} else {
+			$request_method = 'GET';
+		}
 
 		$validated_args = array_merge( $filtered_args, array(
 			'url'     => sprintf( '%s://%s/rest/v%s/%s', $proto, JETPACK__WPCOM_JSON_API_HOST, $version, $_path ),

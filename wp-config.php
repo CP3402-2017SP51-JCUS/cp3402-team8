@@ -1,4 +1,8 @@
 <?php
+
+// Configuration common to all environments
+include_once __DIR__ . '/wp-config.common.php';
+
 /**
  * The base configuration for WordPress
  *
@@ -20,19 +24,19 @@
 
 // ** MySQL settings - You can get this info from your web host ** //
 /** The name of the database for WordPress */
-define('DB_NAME', 'andricoc_assn2');
+define('DB_NAME', 'bitnami_wordpress');
 
 /** MySQL database username */
-define('DB_USER', 'andricoc_assn2');
+define('DB_USER', 'bn_wordpress');
 
 /** MySQL database password */
-define('DB_PASSWORD', 'o)pf!1B6S4');
+define('DB_PASSWORD', '1217cfc40e');
 
 /** MySQL hostname */
-define('DB_HOST', 'localhost');
+define('DB_HOST', '127.0.0.1:3306');
 
 /** Database Charset to use in creating database tables. */
-define('DB_CHARSET', 'utf8mb4');
+define('DB_CHARSET', 'utf8');
 
 /** The Database Collate type. Don't change this if in doubt. */
 define('DB_COLLATE', '');
@@ -46,14 +50,14 @@ define('DB_COLLATE', '');
  *
  * @since 2.6.0
  */
-define('AUTH_KEY',         'wxcpipxgf4durjoambt29twgsdgrmwqgonrspifkozxd8gvhydazqurglprg1tq9');
-define('SECURE_AUTH_KEY',  'brp3hergdwpgub2ycf4psauf2hytopsttbgwtvg4wecefnzdc85burrqjx7stftr');
-define('LOGGED_IN_KEY',    'hukenkgapfdyn4cgfsmhl7yaz1a0oiyivfsqxln2llsrvkfphtcs1njwzud3eiks');
-define('NONCE_KEY',        'zd3rr3ts81hs2n1n9pzbmrlqjhrc8gy4nqsvwnmh3ghxsbztabwxsvm6se984bnr');
-define('AUTH_SALT',        '5jxql0sbhjtnwfzpia9ixfykxyv0vl9i5yc5syr94eizin9ke2tx9fkib1iqqqdn');
-define('SECURE_AUTH_SALT', 'wsnpnjupoxq1hhi09vbjzw2o5cdrvlbixno6fz9wimfzxuyay1dazvouodg7s9y7');
-define('LOGGED_IN_SALT',   'bogyanrlgyhqglv0gbd9rl6ba9ueh4o9zwbjsgc2aquc51st5mntankm9z6qc7ae');
-define('NONCE_SALT',       'ic1wy1bfpy24hujnh3nsm27rgr9wptd680ejih6alapdueozc5qb73u7fade1x90');
+define('AUTH_KEY',         '492f5978e922cbc24bd84992c1a437e2e7a60598a8d757c9e2d19d2927251569');
+define('SECURE_AUTH_KEY',  '8c89241c99002fedc7ae643b3ae8291a9025d6f6dbbc8bcd45ff4ca6544071c3');
+define('LOGGED_IN_KEY',    '4472239d2811435c43273ae596d6cdfefeb3c2f6ef348a4229ed766831c62fd0');
+define('NONCE_KEY',        '8c4c324a8ffa37b61c98fdceba721178d4e288fdbe79276f75222e13c9a6b235');
+define('AUTH_SALT',        'b35a1d1779464bc88a87d80d2ea83dd1abbd748d3bcf0cb93d311640c72e39d6');
+define('SECURE_AUTH_SALT', '75443e540d2c4a695477202725261c6ab397ef44d3ba02d9accb1ff185734b9b');
+define('LOGGED_IN_SALT',   'd165a3b23522126d63655c691afa09fe73a5f1895c3306810d03499ca1d9b4e2');
+define('NONCE_SALT',       '4e475b7cd145d1b5bed824b4411f6a81545daec24aa5f2da93e575b6ebe8ad7a');
 
 /**#@-*/
 
@@ -78,9 +82,19 @@ $table_prefix  = 'assn2_';
  * @link https://codex.wordpress.org/Debugging_in_WordPress
  */
 define('WP_DEBUG', false);
-define( 'WP_MEMORY_LIMIT', '128M' );
 
 /* That's all, stop editing! Happy blogging. */
+/**
+ * The WP_SITEURL and WP_HOME options are configured to access from any hostname or IP address.
+ * If you want to access only from an specific domain, you can modify them. For example:
+ *  define('WP_HOME','http://example.com');
+ *  define('WP_SITEURL','http://example.com');
+ *
+*/
+
+define('WP_SITEURL', 'http://' . $_SERVER['HTTP_HOST'] . '/wordpress');
+define('WP_HOME', 'http://' . $_SERVER['HTTP_HOST'] . '/wordpress');
+
 
 /** Absolute path to the WordPress directory. */
 if ( !defined('ABSPATH') )
@@ -89,5 +103,21 @@ if ( !defined('ABSPATH') )
 /** Sets up WordPress vars and included files. */
 require_once(ABSPATH . 'wp-settings.php');
 
-# Disables all core updates. Added by SiteGround Autoupdate:
-define( 'WP_AUTO_UPDATE_CORE', false );
+define('WP_TEMP_DIR', 'C:\Bitnami\wordpress-4.7.4-0/apps/wordpress/tmp');
+
+
+
+//  Disable pingback.ping xmlrpc method to prevent Wordpress from participating in DDoS attacks
+//  More info at: https://docs.bitnami.com/?page=apps&name=wordpress&section=how-to-re-enable-the-xml-rpc-pingback-feature
+
+// remove x-pingback HTTP header
+add_filter('wp_headers', function($headers) {
+    unset($headers['X-Pingback']);
+    return $headers;
+});
+// disable pingbacks
+add_filter( 'xmlrpc_methods', function( $methods ) {
+        unset( $methods['pingback.ping'] );
+        return $methods;
+});
+add_filter( 'auto_update_translation', '__return_false' );
